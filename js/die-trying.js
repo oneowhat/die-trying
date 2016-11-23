@@ -144,16 +144,35 @@ function checkInbounds(drawable) {
 }
 
 function Enemy() {
+  var counter = 0;
+  var currentPhase;
+
+  this.movementPhases = {
+    "enter": { speedX: 0, speedY: 1, stop: 150, next: "wait" },
+    "wait": { speedX: 0, speedY: 0, stop: 120, next: "leave" },
+    "leave": { speedX: 0, speedY: -1, stop: 200 }
+  };
+
   this.speed = 4;
-  //this.bulletPool = new BulletPool(60);
-  //this.bulletPool.init();
+  this.movePhase = this.movementPhases.enter;
 
   this.draw = function () {
     this.context.drawImage(images.enemy, this.x, this.y);
   };
 
   this.move = function () {
+    counter++;
+    this.context.clearRect(this.x, this.y, this.width, this.height);
 
+    if(this.movePhase && counter <= this.movePhase.stop) {
+      this.y += this.movePhase.speedY;
+    } else {
+      counter = 0;
+      if(this.movePhase.next) {
+        this.movePhase = this.movementPhases[this.movePhase.next];
+      }
+    }
+    this.draw();
   }
 }
 Enemy.prototype = new Drawable();
@@ -278,5 +297,6 @@ function animate() {
   requestAnimationFrame(animate);
   game.bg.draw();
   game.hero.move();
+  game.enemy.move();
   game.hero.bulletPool.animate();
 }
