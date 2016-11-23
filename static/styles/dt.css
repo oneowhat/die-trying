@@ -1,0 +1,19 @@
+body {
+  background-color: black;
+}
+
+#canvas-container {
+}
+
+canvas {
+  position: absolute;
+  background: transparent;
+}
+
+#bg {
+  z-index: 0;
+}
+
+#hero {
+  z-index: 1;
+}
