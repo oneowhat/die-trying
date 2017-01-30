@@ -1,35 +1,37 @@
-var TOTAL_ASSETS = 4;
+var images = (function() {
 
-var images = new function() {
-  var assetsLoaded = 0;
-
-  this.bg = new Image();
-  this.hero = new Image();
-  this.enemy = new Image();
-  this.bullet = new Image();
-
-  this.bg.src = "static/images/bg-1.png";
-  this.hero.src = "static/images/hero.png";
-  this.enemy.src = "static/images/enemy-1.png";
-  this.bullet.src = "static/images/bullet.png";
-
-  this.bg.onload = function() {
-    imageLoaded();
-  };
-  this.hero.onload = function() {
-    imageLoaded();
-  };
-  this.enemy.onload = function() {
-    imageLoaded();
-  };
-  this.bullet.onload = function() {
-    imageLoaded();
-  };
+  var TOTAL_ASSETS = 4,
+      assetsLoaded = 0,
+      bg = new Image(),
+      hero = new Image(),
+      enemy = new Image(),
+      bullet = new Image(),
+      cb;
 
   function imageLoaded() {
     assetsLoaded++;
     if(assetsLoaded === TOTAL_ASSETS) {
-      window.init();
+      cb();
     }
   }
-}
+
+  bg.onload = imageLoaded;
+  hero.onload = imageLoaded;
+  enemy.onload = imageLoaded;
+  bullet.onload = imageLoaded;
+
+  return {
+    bg: bg,
+    hero: hero,
+    enemy: enemy,
+    bullet: bullet,
+    load: function(callback) {
+      cb = callback;
+      bg.src = "static/images/bg-1.png";
+      hero.src = "static/images/hero.png";
+      enemy.src = "static/images/enemy-1.png";
+      bullet.src = "static/images/bullet.png";
+    }
+  };
+
+})();
