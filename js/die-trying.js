@@ -6,7 +6,7 @@ var dt = (function() {
       heroCtx,
       enemyCanvas,
       enemyCtx,
-      game,
+      gameInstance,
       imagesLoaded = false;
 
   Object.prototype.extend = function (extension) {
@@ -21,25 +21,24 @@ var dt = (function() {
     return object;
   };
 
-  var Drawable = {
-    padding: 0,
-    speed: 0,
-    canvasWidth: 0,
-    canvasHeight: 0,
-    create: function() {
-      var newDrawable = Object.create(this);
-      return newDrawable;
-    },
+  var area = {
     init: function(x, y, width, height) {
       this.x = x;
       this.y = y;
       this.width = width;
       this.height = height;
-    },
-    draw: function() { }
+    }
   };
 
-  var Pool = {
+  var drawable = area.extend({
+    padding: 0,
+    speed: 0,
+    canvasWidth: 0,
+    canvasHeight: 0,
+    draw: function() { }
+  });
+
+  var pool = {
     pool: [],
     create: function() {
       return Object.create(this);
@@ -58,7 +57,7 @@ var dt = (function() {
     }
   };
 
-  var Background = Drawable.extend({
+  var background = drawable.extend({
     speed: 2,
     create: function(x, y) {
       var bg = Object.create(this)
@@ -76,7 +75,7 @@ var dt = (function() {
     }
   });
 
-  var Hero = Drawable.extend({
+  var hero = drawable.extend({
     counter: 0,
     fireRate: 7,
     keyStatus: {
@@ -88,12 +87,10 @@ var dt = (function() {
     },
     speed: 7,
     padding: 10,
-    bulletPool: {},
     create: function(x, y, width, height) {
       var newHero = Object.create(this);
       newHero.init(x, y, width, height);
-      newHero.bulletPool = BulletPool.create(60);
-      newHero.bulletPool.init();
+      newHero.bulletPool = bulletPool.create(60);
       return newHero;
     },
     draw: function () {
@@ -141,7 +138,7 @@ var dt = (function() {
     }
   });
 
-  var Enemy = Drawable.extend({
+  var enemy = drawable.extend({
     counter: 0,
     currentPhase: null,
     movementPhases: {
@@ -176,12 +173,12 @@ var dt = (function() {
     }
   });
 
-  var Bullet = Drawable.extend({
-    alive: false,
+  var bullet = drawable.extend({
     create: function(x, y, width, height) {
-      var bullet = Object.create(this);
-      bullet.init(x, y, width, height);
-      return bullet;
+      var b = Object.create(this);
+      b.init(x, y, width, height);
+      b.alive = false;
+      return b;
     },
     draw: function() {
       this.context.clearRect(this.x, this.y, this.width, this.height);
@@ -203,17 +200,17 @@ var dt = (function() {
     }
   });
 
-  var BulletPool = Pool.extend({
-    maxSize: 0,
+  var bulletPool = pool.extend({
     create: function(maxSize) {
       var bp = Object.create(this);
       bp.maxSize = maxSize;
+      bp.init();
       return bp;
     },
     init: function() {
       for (var i = 0; i < this.maxSize; i++) {
-        var bullet = Bullet.create(0, 0, images.bullet.width, images.bullet.height);
-        this.pool.push(bullet);
+        var b = bullet.create(0, 0, images.bullet.width, images.bullet.height);
+        this.pool.push(b);
       }
     },
     getOne: function(b) {
@@ -230,10 +227,7 @@ var dt = (function() {
     }
   });
 
-  var Game = {
-    bg: {},
-    hero: {},
-    enemy: {},
+  var game = {
     create: function() {
       return Object.create(this);
     },
@@ -245,33 +239,17 @@ var dt = (function() {
       if(!bgCanvas.getContext)
         return false;
 
-      bgCtx = bgCanvas.getContext("2d");
-      heroCtx = heroCanvas.getContext("2d");
-      enemyCtx = enemyCanvas.getContext("2d");
+      assignCanvasContext(background, bgCanvas);
+      assignCanvasContext(hero, heroCanvas);
+      assignCanvasContext(bullet, enemyCanvas);
+      assignCanvasContext(enemy, enemyCanvas);
 
-      Background.context = bgCtx;
-      Background.canvasWidth = bgCanvas.width;
-      Background.canvasHeight = bgCanvas.height;
-
-      Hero.context = heroCtx;
-      Hero.canvasWidth = heroCanvas.width;
-      Hero.canvasHeight = heroCanvas.height;
-
-      Bullet.context = enemyCtx;
-      Bullet.canvasWidth = enemyCanvas.width;
-      Bullet.canvasHeight = enemyCanvas.height;
-
-      Enemy.context = enemyCtx;
-      Enemy.canvasWidth = enemyCanvas.width;
-      Enemy.canvasHeight = enemyCanvas.height;
-
-      this.bg = Background.create(0, 0);
-      this.hero = Hero.create(320, 400, 40, 40);
-      this.enemy = Enemy.create(250, -100, 200, 150);
+      this.bg = background.create(0, 0);
+      this.hero = hero.create(320, 400, 40, 40);
+      this.enemy = enemy.create(250, -100, 200, 150);
 
       return true;
     },
-
     start: function () {
       this.hero.draw();
       this.enemy.draw();
@@ -279,8 +257,14 @@ var dt = (function() {
     }
   }
 
-  function checkInbounds(drawable) {
-    var d = drawable;
+  function assignCanvasContext(drawablePrototype, canvas) {
+    drawablePrototype.context = canvas.getContext("2d");
+    drawablePrototype.canvasWidth = canvas.width;
+    drawablePrototype.canvasHeight = canvas.height;
+  }
+
+  function checkInbounds(drawableObj) {
+    var d = drawableObj;
     if (d.x < d.padding) {
       d.x = d.padding;
     }
@@ -302,30 +286,25 @@ var dt = (function() {
 
   function animate() {
     requestAnimationFrame(animate);
-    game.bg.draw();
-    game.hero.move();
-    game.enemy.move();
-    game.hero.bulletPool.animate();
+    gameInstance.bg.draw();
+    gameInstance.hero.move();
+    gameInstance.enemy.move();
+    gameInstance.hero.bulletPool.animate();
   }
 
   return {
     init: function() {
       images.load(function() {
-
-        game = Game.create();
-
-        if(game.init()) {
-          game.start();
+        gameInstance = game.create();
+        if(gameInstance.init()) {
+          gameInstance.start();
         }
-
         document.onkeydown = function(e) {
-          game.hero.setKeyStatus(e, true);
+          gameInstance.hero.setKeyStatus(e, true);
         }
-
         document.onkeyup = function(e) {
-          game.hero.setKeyStatus(e, false);
+          gameInstance.hero.setKeyStatus(e, false);
         }
-
       });
     }
   }
