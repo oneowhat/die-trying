@@ -147,7 +147,6 @@ var dt = (function() {
       "leave": { speedX: 0, speedY: -1, stop: 200 }
     },
     speed: 4,
-    movePhase: {},
     create: function(x, y, width, height) {
       var enemy = Object.create(this);
       enemy.init(x, y, width, height);
@@ -306,7 +305,8 @@ var dt = (function() {
           gameInstance.hero.setKeyStatus(e, false);
         }
       });
-    }
+    },
+    area: area
   }
 
 })();
