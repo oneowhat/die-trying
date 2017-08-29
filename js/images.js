@@ -1,5 +1,7 @@
 var images = (function() {
 
+  'use strict';
+
   var TOTAL_ASSETS = 4,
       assetsLoaded = 0,
       bg = new Image(),

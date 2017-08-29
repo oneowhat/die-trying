@@ -1,0 +1,29 @@
+{
+  "name": "die-trying",
+  "version": "1.0.0",
+  "description": "Space shooter",
+  "main": "die-trying.js",
+  "scripts": {
+    "lint": "eslint .",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oneowhat/die-trying.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/oneowhat/die-trying/issues"
+  },
+  "homepage": "https://github.com/oneowhat/die-trying#readme",
+  "devDependencies": {
+    "babel-eslint": "^7.2.3",
+    "chai": "^4.1.1",
+    "eslint": "^4.5.0",
+    "eslint-config-defaults": "^9.0.0",
+    "eslint-plugin-react": "^7.3.0",
+    "mocha": "^3.5.0",
+    "sinon": "^3.2.1"
+  }
+}
