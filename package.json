@@ -23,7 +23,7 @@
     "eslint": "^4.5.0",
     "eslint-config-defaults": "^9.0.0",
     "eslint-plugin-react": "^7.3.0",
-    "mocha": "^8.4.0",
+    "mocha": "^10.2.0",
     "sinon": "^3.2.1"
   }
 }
