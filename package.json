@@ -20,7 +20,7 @@
   "devDependencies": {
     "babel-eslint": "^7.2.3",
     "chai": "^4.1.1",
-    "eslint": "^4.5.0",
+    "eslint": "^8.38.0",
     "eslint-config-defaults": "^9.0.0",
     "eslint-plugin-react": "^7.3.0",
     "mocha": "^8.4.0",
